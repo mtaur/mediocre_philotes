@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mediocre Philotes</title>
+  <!-- Latest compiled and minified CSS & JS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+<h1>Mediocre Philotes</h1>
+<img src="http://s42.radikal.ru/i098/1212/9b/6c97af35fe82t.jpg" style="max-width: 300px;" alt="Mediore Philotes"/>
+
+<strong>Create profile:</strong>  Reads all fields to create profile.  Edits not enabled in pre-alpha v.0.0, so make sure you get it right.<br>
+<strong>Log in:</strong>  Only reads username.  Doesn't really do a whole lot, but pre-alpha 1.0 has plans to store likes.<br>
+<strong>Log out:</strong>  Sets user to null.<br>
+<strong>Browse:</strong>  Look at all existing users.  Click portrait and inspect front-end console to see the magic.
+<br>
+
+<h3>Stretch goals:</h3>  Give each user a likes array, an email address, and a password. <br>
+<strong>Password:</strong> Stored on backend, used with log in to validate actions for existing user.<br>
+<strong>Friends:</strong>  When you like someone, push username reference to user.likes.  When you browse, you should see who likes you and vice versa, but all other like data should be witheld.<br>
+<strong>Email:</strong>  Back end sends this the front end ONLY FOR MUTUAL LIKES.<br>
+<strong>Refactor "user"</strong> to have sub-objects "public", "private", and "restricted".  (password is private, email is restricted)
+<strong>[Kickstarter/paypal goes here]</strong>
+
+<form>
+  <label for="username">Input username (use for login)</label>
+  <input type="text" id="username" value="freddie"><br>
+
+  <label for="name">Input name (how others will see you)</label>
+  <input type="text" id="name" value="Freddie"><br>
+
+  <label for="about">About you</label>
+  <input type="text" id="about" value="I'm a goat!"><br>
+
+  <label for="species">Species (why not?)</label>
+  <input type="text" id="species" value="goat"><br>
+
+  <label for="img">Image URL</label>
+  <input type="text" id="img" value="https://mtaur.github.io/homework5/TriviaGame/assets/images/Freddie.jpg"><br>
+
+  <!--input id="add-meme" type="submit" value=""-->
+
+</form>
+
+
+<div id="button-row"></div>
+
+
+
+<div id="form"></div>
+
+<div id="results"></div>
+
+<div id="newbie-console"></div>
+
+  <script type="text/javascript">
+
+//    $(document).ready(
+  //      function(){
+
+      function makeButton(name,text,action)
+        {
+            var button = $("<button>");
+            button.attr('btn-name',name).text(text);
+            $('#button-row').append(button);
+            button.click(action);
+//            button.click(function(){console.log('Clicked',button.attr('btn-name'),button.text())});
+        }
+
+    makeButton('new-user','Create profile', create);
+    makeButton('login', 'Log in', login);
+    makeButton('logout', 'Log out', logout);
+    makeButton('browse', 'Browse profiles', browse);
+
+    var user = {
+          username: 'freddie',
+          name: 'Freddie',
+          about: 'I\'m a goat!',
+          species: 'goat',
+          img: 'https://mtaur.github.io/homework5/TriviaGame/assets/images/Freddie.jpg'
+        };
+
+
+    function browse() {
+//        $.get("/browse", showResults);
+          $.get("/browse", user, showResults);
+    }
+
+    function showResults(data) {
+        $('#results').html('');
+        console.log(data);
+        var users = JSON.parse(data);
+        console.log(users);
+        console.log(users[0]);
+        users.forEach(appendUserData);
+//        $('#results').html(data);
+    }
+
+    function appendUserData(item) {
+        var newdiv = $('<div>');
+        $('#results').append(newdiv);
+        newdiv.attr('style','border-width:3px; border-style:solid; margin:3px; padding:3px; border-color:blue;');
+        var image = $('<img>');
+        image.attr('src',item.img);
+        image.attr('alt',item.name);
+        image.attr('username',item.username);
+        image.attr('style','max-width: 200px;');
+        image.click(likeMe);
+        newdiv.append(image);
+        newdiv.append('<br>');
+        newdiv.append(item.name + '<br>');
+        newdiv.append(item.about + '<br>');
+    }
+
+    function likeMe() {
+      console.log(user.username,'likes',$(this).attr('username'),'!!!');
+      $('#newbie-console').append(user.username+' likes '+ $(this).attr('username'),'!!!<br>');
+    }
+
+    function create() {
+        user.username = $('#username').val();
+        user.name = $('#name').val();
+        user.img = $('#img').val();
+        user.about = $('#about').val();
+        user.species = $('#species').val();
+
+        $.get("/create", user);
+    }
+
+    function logout() {
+        user = {};
+        $('#form').html('');
+        $('#results').html('');
+    }
+
+    function login() {
+        user.username = $('#username').val();
+        console.log('This should actually fetch the object from the back end...');
+    }
+    /*
+      $.get("/api/" + searchedCharacter, function(data) {
+        console.log(data);
+        if (data) {
+          $("#stats").show();
+          $("#name").text(data.name);
+          $("#about").text(data.about);
+          $("#image").text(data.image);
+//          $("#email").text(data.email);
+//          $("#password").text(data.password);
+        }
+        else {
+          $("#name").text("The force is not strong with this one. Your character was not found.");
+          $("#stats").hide();
+        }
+      });  */
+
+  </script>
+
+</body>
+</html>
